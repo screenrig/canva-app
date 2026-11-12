@@ -1,0 +1,23 @@
+.container {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: var(--ui-kit-space-300);
+  overflow-y: auto;
+}
+
+/* Each page shows on a dark screen with a thin bezel, as on glass. */
+.screen {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto var(--ui-kit-space-300);
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border: 6px solid #1c1c1f;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
