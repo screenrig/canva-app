@@ -107,14 +107,20 @@ export const SettingsUi = ({
     });
   }, [registerOnContextChange]);
 
+  const [connecting, setConnecting] = useState(false);
+
+  // The connect button stays on screen while Canva runs the sign-in, and
+  // whatever the outcome, the token Canva now holds decides the state.
   const connect = async () => {
-    setConnection({ state: "loading" });
-    const response = await oauth.requestAuthorization({ scope: SCOPE });
-    if (response.status === "completed") {
-      await load();
-    } else {
-      setConnection({ state: "signed_out" });
+    setConnecting(true);
+    try {
+      await oauth.requestAuthorization({ scope: SCOPE });
+    } catch {
+      // A closed or refused sign-in leaves the person signed out.
+    } finally {
+      setConnecting(false);
     }
+    await load();
   };
 
   const disconnect = async () => {
@@ -180,7 +186,13 @@ export const SettingsUi = ({
             {connection.error && (
               <Alert tone="critical">{connection.error}</Alert>
             )}
-            <Button variant="primary" stretch onClick={connect}>
+            <Button
+              variant="primary"
+              stretch
+              loading={connecting}
+              disabled={connecting}
+              onClick={connect}
+            >
               {intl.formatMessage({
                 defaultMessage: "Connect screenRIG",
                 description: "Button that starts screenRIG sign-in",
@@ -224,7 +236,7 @@ export const SettingsUi = ({
                     value={settings.screenIds}
                     options={connection.screens.map((screen) => ({
                       value: screen.id,
-                      label: screen.name,
+                      label: screen.label || screen.id,
                     }))}
                     onChange={(screenIds) =>
                       setSettings({ ...settings, screenIds })

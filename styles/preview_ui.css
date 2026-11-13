@@ -21,3 +21,8 @@
   justify-content: center;
   overflow: hidden;
 }
+
+/* The card fills the screen; without a width it collapses in the flex box. */
+.screen > * {
+  width: 100%;
+}

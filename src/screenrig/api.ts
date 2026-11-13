@@ -108,7 +108,8 @@ export type Playlist = {
 export type PlaylistPage = Record<string, unknown> & { id: string };
 export type Screen = {
   id: string;
-  name: string;
+  /** The name the project gives the screen. */
+  label: string;
   playlist_id?: string | null;
   state?: string;
 };

@@ -9,6 +9,8 @@ import type {
   RenderPreviewUiRequest,
   RenderSettingsUiRequest,
 } from "@canva/intents/content";
+import type { ReactNode } from "react";
+import type { Root } from "react-dom/client";
 import { createRoot } from "react-dom/client";
 import "@canva/app-ui-kit/styles.css";
 import { ApiError, SignedOutError } from "src/screenrig/api";
@@ -29,26 +31,26 @@ const intl = initIntl();
 // A playlist holds at most 100 pages.
 const MAX_PAGES = 100;
 
-function renderSettingsUi(request: RenderSettingsUiRequest) {
-  const root = createRoot(document.getElementById("root") as Element);
+// One React root for the iframe: Canva may ask for a view again (after
+// sign-in, for example), and a second root on the same element would leave
+// the first one's stale view in place.
+let root: Root | undefined;
+
+function mount(view: ReactNode) {
+  root ??= createRoot(document.getElementById("root") as Element);
   root.render(
     <AppI18nProvider>
-      <AppUiProvider>
-        <SettingsUi {...request} />
-      </AppUiProvider>
+      <AppUiProvider>{view}</AppUiProvider>
     </AppI18nProvider>,
   );
 }
 
+function renderSettingsUi(request: RenderSettingsUiRequest) {
+  mount(<SettingsUi {...request} />);
+}
+
 function renderPreviewUi(request: RenderPreviewUiRequest) {
-  const root = createRoot(document.getElementById("root") as Element);
-  root.render(
-    <AppI18nProvider>
-      <AppUiProvider>
-        <PreviewUi {...request} />
-      </AppUiProvider>
-    </AppI18nProvider>,
-  );
+  mount(<PreviewUi {...request} />);
 }
 
 async function getPublishConfiguration(): Promise<GetPublishConfigurationResponse> {
